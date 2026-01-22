@@ -34,8 +34,9 @@ A premium, high-end WordPress ribbon slider plugin designed for elegant program 
 
 Use the following shortcode in your pages, posts, or widgets:
 
-```shortcode
-[showcase group="artificial-intelligence" limit="5" time="3000"]```
+```bash
+[showcase group="artificial-intelligence" limit="5" time="3000"]
+```
 
 ### Parameters
 
