@@ -46,16 +46,3 @@ Use the following shortcode in your pages, posts, or widgets:
 | `limit`    | `6`     | Maximum number of slides to show. |
 | `time`     | `5000`  | The autoplay interval in milliseconds (e.g., `3000` for 3 seconds). |
 | `autoplay` | `true`  | Set to `false` to disable automatic sliding. |
-
----
-
-### 🎨 Design Specs
-
-The plugin is hard-coded to respect a premium aesthetic:
-
-- **Primary Color**: `#c02126` *(CIPIT Red)*  
-- **Secondary Color**: `#2a2c32` *(Deep Charcoal)*  
-- **Border Radius**:  
-  - `12px` for containers  
-  - `30px` for buttons  
-- **Layout**: `16:5` ribbon aspect ratio for a non-intrusive "showcase" feel
