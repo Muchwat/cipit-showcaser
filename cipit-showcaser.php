@@ -1,10 +1,12 @@
 <?php
 /**
  * Plugin Name: CIPIT Showcaser
- * Plugin URI: https://github.com/Muchwat/cipit-showcaser.git
+ * Plugin URI: https://github.com/Muchwat/cipit-showcaser.git  
  * Description: A high-end ribbon slider with autoplay, 50/50 split layout, tech decorations, and adaptive contrast.
  * Version: 3.3
  * Author: Kevin Muchwat
+ * Author URI: https://github.com/Muchwat
+ * Text Domain: cipit-showcaser
  */
 
 if (!defined('ABSPATH'))
@@ -100,10 +102,14 @@ add_shortcode('showcase', function ($atts) {
         'excerpt' => 10 // New word count param
     ], $atts);
 
-    $interval = (intval($atts['time']) < 100) ? intval($atts['time']) * 1000 : intval($atts['time']);
+    // Optimized: cache intval and avoid triple call
+    $time_val = intval($atts['time']);
+    $interval = ($time_val < 100) ? $time_val * 1000 : $time_val;
 
     $primary_red = '#c02126';
-    $is_primary_bg = (strtolower(trim($atts['bg'])) === $primary_red || strtolower(trim($atts['bg'])) === 'c02126') ? true : false;
+    // Optimized: handle both #c02126 and c02126 safely
+    $clean_bg = ltrim(strtolower(trim($atts['bg'])), '#');
+    $is_primary_bg = ($clean_bg === 'c02126');
     $contrast_color = $is_primary_bg ? '#ffffff' : $primary_red;
     $contrast_text = $is_primary_bg ? $primary_red : '#ffffff';
 
@@ -153,7 +159,7 @@ add_shortcode('showcase', function ($atts) {
                         $query->the_post();
                         $post_id = get_the_ID();
                         $img = get_the_post_thumbnail_url($post_id, 'large');
-                        $img = $img ? $img : 'https://via.placeholder.com/1600x500?text=No+Image';
+                        $img = $img ? $img : 'https://via.placeholder.com/1600x500?text=No+Image  ';
 
                         $custom_tag = get_post_meta($post_id, '_showcase_tag', true);
                         $btn_text = get_post_meta($post_id, '_showcase_btn_text', true);
