@@ -4,20 +4,6 @@ A premium, high-end WordPress ribbon slider plugin designed for elegant program 
 
 ---
 
-## ✨ Features
-
-- **Architectural Design**: Features a distinctive *"sharp lens"* circular cutout effect with a perfect 50/50 split between content and imagery.
-- **Intelligent Autoplay**: Smooth transitions every 5 seconds (configurable) with strict hover-pause logic—the slider never moves while the user is interacting with it.
-- **Custom Metaboxes**: Full control over every slide:
-  - **Custom Tag**: Override category slugs with "Featured", "New", or custom labels.
-  - **Dynamic Buttons**: Customize the "Call to Action" text per slide.
-  - **Custom Links**: Point buttons to external registration forms or internal pages.
-  - **Link Targets**: Choose between opening links in the same tab or a new tab (`_blank`).
-- **Shortcode Powered**: Easily deploy anywhere on your site with flexible parameters.
-- **Responsive & Lightweight**: No heavy libraries. Uses native CSS masking and vanilla JavaScript for high performance.
-
----
-
 ## 🚀 Installation
 
 1. Download the `showcase-plugin.php` file.
