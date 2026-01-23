@@ -2,8 +2,8 @@
 /**
  * Plugin Name: CIPIT Showcaser
  * Plugin URI: https://github.com/Muchwat/cipit-showcaser.git
- * Description: A high-end ribbon slider with autoplay, 50/50 split layout, five tech decoration options, and adaptive contrast.
- * Version: 3.2
+ * Description: A high-end ribbon slider with autoplay, 50/50 split layout, tech decorations, and adaptive contrast.
+ * Version: 3.3
  * Author: Kevin Muchwat
  */
 
@@ -95,8 +95,9 @@ add_shortcode('showcase', function ($atts) {
         'limit' => 6,
         'autoplay' => 'true',
         'time' => 5000,
-        'decoration' => 'orbits', // pulses, orbits, brackets, signals, blueprint, or none
-        'bg' => '#2a2c32'
+        'decoration' => 'orbits',
+        'bg' => '#2a2c32',
+        'excerpt' => 10 // New word count param
     ], $atts);
 
     $interval = (intval($atts['time']) < 100) ? intval($atts['time']) * 1000 : intval($atts['time']);
@@ -217,7 +218,7 @@ add_shortcode('showcase', function ($atts) {
                                     </div>
                                     <div class="slide-action-group">
                                         <p class="slide-excerpt">
-                                            <?php echo wp_trim_words(get_the_excerpt(), 10); ?>
+                                            <?php echo wp_trim_words(get_the_excerpt(), intval($atts['excerpt'])); ?>
                                         </p>
                                         <a href="<?php echo esc_url($display_btn_link); ?>"
                                             target="<?php echo esc_attr($display_target); ?>" class="slide-btn">
@@ -350,7 +351,6 @@ add_shortcode('showcase', function ($atts) {
             opacity: 0.8;
         }
 
-        /* STYLE: PULSES */
         .pulse-point {
             position: absolute;
             width: 6px;
@@ -390,7 +390,6 @@ add_shortcode('showcase', function ($atts) {
             animation-delay: 2s;
         }
 
-        /* STYLE: ORBITS */
         .orbit-system {
             position: absolute;
             top: 50%;
@@ -453,7 +452,6 @@ add_shortcode('showcase', function ($atts) {
             box-shadow: 0 0 12px var(--theme-contrast);
         }
 
-        /* STYLE: BRACKETS */
         .bracket {
             position: absolute;
             width: 40px;
@@ -512,7 +510,6 @@ add_shortcode('showcase', function ($atts) {
             letter-spacing: 4px;
         }
 
-        /* STYLE: SIGNALS */
         .signal-wave {
             position: absolute;
             left: 50%;
@@ -540,7 +537,6 @@ add_shortcode('showcase', function ($atts) {
             animation-delay: -2s;
         }
 
-        /* STYLE: BLUEPRINT */
         .blueprint-line {
             position: absolute;
             background: var(--theme-contrast);

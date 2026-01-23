@@ -21,7 +21,7 @@ A premium, high-end WordPress ribbon slider plugin designed for elegant program 
 Use the following shortcode in your pages, posts, or widgets:
 
 ```bash
-[showcase group="ai" limit="5" time="5000" decoration="blueprint" bg="#c02126"]
+[showcase group="ai" limit="5" time="5000" decoration="blueprint" bg="#c02126" excerpt="15"]
 ```
 
 ### Parameters
@@ -33,7 +33,8 @@ Use the following shortcode in your pages, posts, or widgets:
 | `time`     | `5000`  | The autoplay interval in milliseconds (e.g., `3000` for 3 seconds). |
 | `autoplay` | `true`  | Set to `false` to disable automatic sliding. |
 | `decoration` | `pulses` | Options: `pulses`, `orbits`, `brackets`, `signals`, `blueprint`, `none`. |
-| `bg`       | `#c02126`  | Custom background color (hex). UI contrast adapts automatically. ß|
+| `bg`       | `#c02126`  | Custom background color (hex). UI contrast adapts automatically. |
+| `excerpt` | `10` | The number of words to display in the slide description/excerpt. |
 
 
 
