@@ -2,8 +2,8 @@
 /**
  * Plugin Name: CIPIT Showcaser
  * Plugin URI: https://github.com/Muchwat/cipit-showcaser.git
- * Description: A high-end ribbon slider with autoplay, 50/50 split layout, and strict hover-pause logic.
- * Version: 2.5
+ * Description: A high-end ribbon slider with autoplay, 50/50 split layout, five tech decoration options, and adaptive contrast.
+ * Version: 3.2
  * Author: Kevin Muchwat
  */
 
@@ -94,10 +94,17 @@ add_shortcode('showcase', function ($atts) {
         'group' => '',
         'limit' => 6,
         'autoplay' => 'true',
-        'time' => 5000
+        'time' => 5000,
+        'decoration' => 'orbits', // pulses, orbits, brackets, signals, blueprint, or none
+        'bg' => '#2a2c32'
     ], $atts);
 
     $interval = (intval($atts['time']) < 100) ? intval($atts['time']) * 1000 : intval($atts['time']);
+
+    $primary_red = '#c02126';
+    $is_primary_bg = (strtolower(trim($atts['bg'])) === $primary_red || strtolower(trim($atts['bg'])) === 'c02126') ? true : false;
+    $contrast_color = $is_primary_bg ? '#ffffff' : $primary_red;
+    $contrast_text = $is_primary_bg ? $primary_red : '#ffffff';
 
     $args = [
         'post_type' => 'showcase',
@@ -115,7 +122,6 @@ add_shortcode('showcase', function ($atts) {
     }
 
     $query = new WP_Query($args);
-
     if (!$query->have_posts())
         return '';
 
@@ -123,7 +129,8 @@ add_shortcode('showcase', function ($atts) {
     ob_start();
     ?>
     <div class="showcase-container" id="showcase-<?php echo $unique_id; ?>"
-        data-autoplay="<?php echo esc_attr($atts['autoplay']); ?>" data-interval="<?php echo esc_attr($interval); ?>">
+        data-autoplay="<?php echo esc_attr($atts['autoplay']); ?>" data-interval="<?php echo esc_attr($interval); ?>"
+        style="--theme-bg: <?php echo esc_attr($atts['bg']); ?>; --theme-contrast: <?php echo $contrast_color; ?>; --theme-contrast-text: <?php echo $contrast_text; ?>;">
 
         <div class="showcase-slider-wrapper">
             <button class="nav-arrow prev" onclick="moveSlider('<?php echo $unique_id; ?>', -1)" aria-label="Previous">
@@ -163,6 +170,40 @@ add_shortcode('showcase', function ($atts) {
                                     <div class="slide-image" style="background-image: url('<?php echo esc_url($img); ?>');">
                                     </div>
                                     <div class="slide-cutout-overlay"></div>
+
+                                    <div class="slide-decoration style-<?php echo esc_attr($atts['decoration']); ?>">
+                                        <div class="vector-grid"></div>
+
+                                        <?php if ($atts['decoration'] === 'pulses'): ?>
+                                            <div class="pulse-point p1"></div>
+                                            <div class="pulse-point p2"></div>
+                                            <div class="pulse-point p3"></div>
+                                        <?php elseif ($atts['decoration'] === 'orbits'): ?>
+                                            <div class="orbit-system">
+                                                <div class="orbit-ring r1"></div>
+                                                <div class="orbit-ring r2 white"></div>
+                                                <div class="orbit-ring r3"></div>
+                                                <div class="orbit-ring r4 white"></div>
+                                                <div class="orbit-center-dot"></div>
+                                            </div>
+                                        <?php elseif ($atts['decoration'] === 'brackets'): ?>
+                                            <div class="bracket b-tl"></div>
+                                            <div class="bracket b-br"></div>
+                                            <div class="tech-triangle t1"></div>
+                                            <div class="tech-triangle t2"></div>
+                                            <div class="bracket-label">CIPIT</div>
+                                        <?php elseif ($atts['decoration'] === 'signals'): ?>
+                                            <div class="signal-wave s1"></div>
+                                            <div class="signal-wave s2"></div>
+                                            <div class="signal-wave s3"></div>
+                                        <?php elseif ($atts['decoration'] === 'blueprint'): ?>
+                                            <div class="blueprint-line h-line"></div>
+                                            <div class="blueprint-line v-line"></div>
+                                            <div class="coord c1">X: 104.22</div>
+                                            <div class="coord c2">Y: 88.01</div>
+                                            <div class="crosshair"></div>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
 
                                 <div class="slide-details">
@@ -205,10 +246,11 @@ add_shortcode('showcase', function ($atts) {
     <style>
         .showcase-container {
             --theme-red: #c02126;
-            --theme-dark: #2a2c32;
+            --theme-bg: #2a2c32;
+            --theme-contrast: #c02126;
+            --theme-contrast-text: #ffffff;
             --theme-radius: 12px;
             --theme-btn-radius: 30px;
-
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 2.5rem 0;
             width: 100%;
@@ -219,7 +261,7 @@ add_shortcode('showcase', function ($atts) {
             position: relative;
             overflow: hidden;
             border-radius: var(--theme-radius);
-            background: var(--theme-dark);
+            background: var(--theme-bg);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
@@ -278,10 +320,349 @@ add_shortcode('showcase', function ($atts) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--theme-dark);
+            background: var(--theme-bg);
             mask-image: radial-gradient(circle 800px at -300px 50%, transparent 800px, black 800px);
             -webkit-mask-image: radial-gradient(circle 800px at -300px 50%, transparent 800px, black 800px);
-            z-index: 1;
+            z-index: 2;
+        }
+
+        .slide-decoration {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .vector-grid {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background-image:
+                radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 20px 20px, 100px 100px, 100px 100px;
+            opacity: 0.8;
+        }
+
+        /* STYLE: PULSES */
+        .pulse-point {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--theme-contrast);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--theme-contrast);
+        }
+
+        .pulse-point::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            transform: translate(-50%, -50%);
+            border: 1px solid var(--theme-contrast);
+            border-radius: 50%;
+            animation: pulse-ring 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        .pulse-point.p1 {
+            top: 20%;
+            right: 15%;
+        }
+
+        .pulse-point.p2 {
+            bottom: 30%;
+            right: 40%;
+            animation-delay: 1s;
+        }
+
+        .pulse-point.p3 {
+            top: 50%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        /* STYLE: ORBITS */
+        .orbit-system {
+            position: absolute;
+            top: 50%;
+            right: 15%;
+            width: 280px;
+            height: 280px;
+            transform: translateY(-50%);
+        }
+
+        .orbit-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .orbit-ring.white {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .orbit-ring.r1 {
+            width: 100%;
+            height: 100%;
+            animation: rotate-orbit 20s linear infinite;
+            border-top-color: var(--theme-contrast);
+        }
+
+        .orbit-ring.r2 {
+            width: 75%;
+            height: 75%;
+            animation: rotate-orbit 15s linear infinite reverse;
+            border-right-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .orbit-ring.r3 {
+            width: 50%;
+            height: 50%;
+            animation: rotate-orbit 10s linear infinite;
+            border-bottom-color: var(--theme-contrast);
+        }
+
+        .orbit-ring.r4 {
+            width: 30%;
+            height: 30%;
+            animation: rotate-orbit 8s linear infinite reverse;
+            border-left-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .orbit-center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: var(--theme-contrast);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 12px var(--theme-contrast);
+        }
+
+        /* STYLE: BRACKETS */
+        .bracket {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--theme-contrast);
+            opacity: 0.3;
+        }
+
+        .bracket.b-tl {
+            top: 15%;
+            right: 45%;
+            border-right: 0;
+            border-bottom: 0;
+        }
+
+        .bracket.b-br {
+            bottom: 15%;
+            right: 10%;
+            border-left: 0;
+            border-top: 0;
+        }
+
+        .tech-triangle {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 10px solid var(--theme-contrast);
+            opacity: 0.4;
+        }
+
+        .tech-triangle.t1 {
+            top: 25%;
+            right: 12%;
+            transform: rotate(45deg);
+            animation: float-tri 4s ease-in-out infinite;
+        }
+
+        .tech-triangle.t2 {
+            bottom: 25%;
+            right: 42%;
+            transform: rotate(-135deg);
+            animation: float-tri 4s ease-in-out infinite reverse;
+        }
+
+        .bracket-label {
+            position: absolute;
+            bottom: 10%;
+            right: 10%;
+            color: var(--theme-contrast);
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            opacity: 0.8;
+            letter-spacing: 4px;
+        }
+
+        /* STYLE: SIGNALS */
+        .signal-wave {
+            position: absolute;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--theme-contrast), transparent);
+            opacity: 0.3;
+            animation: flow-wave 4s linear infinite;
+        }
+
+        .signal-wave.s1 {
+            top: 30%;
+            animation-duration: 3s;
+        }
+
+        .signal-wave.s2 {
+            top: 50%;
+            animation-duration: 5s;
+            animation-delay: -1s;
+        }
+
+        .signal-wave.s3 {
+            top: 70%;
+            animation-duration: 4s;
+            animation-delay: -2s;
+        }
+
+        /* STYLE: BLUEPRINT */
+        .blueprint-line {
+            position: absolute;
+            background: var(--theme-contrast);
+            opacity: 0.15;
+        }
+
+        .blueprint-line.h-line {
+            top: 50%;
+            right: 5%;
+            width: 40%;
+            height: 1px;
+        }
+
+        .blueprint-line.v-line {
+            top: 10%;
+            right: 25%;
+            width: 1px;
+            height: 80%;
+        }
+
+        .coord {
+            position: absolute;
+            color: var(--theme-contrast);
+            font-family: monospace;
+            font-size: 9px;
+            opacity: 0.5;
+        }
+
+        .coord.c1 {
+            top: 45%;
+            right: 26%;
+        }
+
+        .coord.c2 {
+            top: 52%;
+            right: 26%;
+        }
+
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            right: 25%;
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--theme-contrast);
+            transform: translate(50%, -50%);
+            opacity: 0.4;
+        }
+
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background: var(--theme-contrast);
+        }
+
+        .crosshair::before {
+            top: 50%;
+            left: -5px;
+            width: 30px;
+            height: 1px;
+        }
+
+        .crosshair::after {
+            left: 50%;
+            top: -5px;
+            width: 1px;
+            height: 30px;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                width: 6px;
+                height: 6px;
+                opacity: 1;
+            }
+
+            100% {
+                width: 60px;
+                height: 60px;
+                opacity: 0;
+            }
+        }
+
+        @keyframes rotate-orbit {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @keyframes float-tri {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(45deg);
+                opacity: 0.4;
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(45deg);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes flow-wave {
+            0% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+
+            100% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
         }
 
         .slide-media-area::after {
@@ -291,8 +672,8 @@ add_shortcode('showcase', function ($atts) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, var(--theme-dark) 0%, rgba(42, 44, 50, 0) 50%);
-            z-index: 2;
+            background: linear-gradient(90deg, var(--theme-bg) 0%, rgba(42, 44, 50, 0) 50%);
+            z-index: 1;
             pointer-events: none;
         }
 
@@ -313,7 +694,8 @@ add_shortcode('showcase', function ($atts) {
         }
 
         .slide-tag {
-            background: var(--theme-red);
+            background: var(--theme-contrast);
+            color: var(--theme-contrast-text);
             padding: 4px 12px;
             border-radius: 4px;
             font-size: 11px;
@@ -346,15 +728,15 @@ add_shortcode('showcase', function ($atts) {
         }
 
         .slide-btn {
-            background: var(--theme-red);
-            color: #fff;
+            background: var(--theme-contrast);
+            color: var(--theme-contrast-text);
             padding: 12px 28px;
             border-radius: var(--theme-btn-radius);
             text-decoration: none;
             font-weight: 600;
             font-size: 14px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(192, 33, 38, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         .slide-btn:hover {
@@ -387,7 +769,7 @@ add_shortcode('showcase', function ($atts) {
         }
 
         .dot.active {
-            background: var(--theme-red);
+            background: var(--theme-contrast);
             width: 20px;
             border-radius: 4px;
         }
@@ -397,8 +779,8 @@ add_shortcode('showcase', function ($atts) {
             top: 50%;
             transform: translateY(-50%);
             z-index: 11;
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             border: 1px solid rgba(255, 255, 255, 0.2);
             background: rgba(0, 0, 0, 0.2);
@@ -408,19 +790,27 @@ add_shortcode('showcase', function ($atts) {
             align-items: center;
             justify-content: center;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
         .showcase-slider-wrapper:hover .nav-arrow {
             opacity: 1;
         }
 
+        .nav-arrow:hover {
+            background: var(--theme-contrast);
+            border-color: var(--theme-contrast);
+            transform: translateY(-50%) scale(1.15);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            color: var(--theme-contrast-text);
+        }
+
         .nav-arrow.prev {
-            left: 20px;
+            left: 25px;
         }
 
         .nav-arrow.next {
-            right: 20px;
+            right: 25px;
         }
 
         @media (max-width: 992px) {
@@ -460,71 +850,43 @@ add_shortcode('showcase', function ($atts) {
 
     <script>
         const sliderInstances = {};
-
         function moveSlider(id, dir) {
             const vp = document.getElementById('viewport-' + id);
             const amt = vp.offsetWidth;
-
             if (vp.scrollLeft + (amt * dir) >= vp.scrollWidth) vp.scrollTo({ left: 0, behavior: 'smooth' });
             else if (vp.scrollLeft + (amt * dir) < 0) vp.scrollTo({ left: vp.scrollWidth, behavior: 'smooth' });
             else vp.scrollBy({ left: amt * dir, behavior: 'smooth' });
-
             resetAutoplay(id);
         }
-
         function jumpToSlide(id, idx) {
             const vp = document.getElementById('viewport-' + id);
             vp.scrollTo({ left: vp.offsetWidth * idx, behavior: 'smooth' });
             resetAutoplay(id);
         }
-
-        /**
-         * Clears existing timer and starts a new one 
-         * ONLY if the mouse is not currently over the slider.
-         */
         function resetAutoplay(id) {
             if (sliderInstances[id]) {
                 clearInterval(sliderInstances[id].timer);
                 const container = document.getElementById('showcase-' + id);
-                // Check if user is currently hovering
-                if (!container.matches(':hover')) {
-                    startAutoplay(id);
-                }
+                if (!container.matches(':hover')) { startAutoplay(id); }
             }
         }
-
         function startAutoplay(id) {
             const el = document.getElementById('showcase-' + id);
             const iv = parseInt(el.dataset.interval) || 5000;
-            if (el.dataset.autoplay === 'true') {
-                sliderInstances[id] = {
-                    timer: setInterval(() => moveSlider(id, 1), iv)
-                };
-            }
+            if (el.dataset.autoplay === 'true') { sliderInstances[id] = { timer: setInterval(() => moveSlider(id, 1), iv) }; }
         }
-
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.showcase-slider-viewport').forEach(vp => {
                 const id = vp.id.replace('viewport-', '');
                 const dots = document.querySelectorAll('#indicators-' + id + ' .dot');
                 const container = document.getElementById('showcase-' + id);
-
                 vp.addEventListener('scroll', () => {
                     const idx = Math.round(vp.scrollLeft / vp.offsetWidth);
                     dots.forEach((d, i) => d.classList.toggle('active', i === idx));
                 }, { passive: true });
-
                 startAutoplay(id);
-
-                // Clear timer on enter
-                container.addEventListener('mouseenter', () => {
-                    if (sliderInstances[id]) clearInterval(sliderInstances[id].timer);
-                });
-
-                // Resume autoplay on leave
-                container.addEventListener('mouseleave', () => {
-                    startAutoplay(id);
-                });
+                container.addEventListener('mouseenter', () => { if (sliderInstances[id]) clearInterval(sliderInstances[id].timer); });
+                container.addEventListener('mouseleave', () => { startAutoplay(id); });
             });
         });
     </script>
